@@ -259,7 +259,7 @@ async function getStudentDetails(req, res) {
           },
           {
             model: db.Payment,
-            attributes: ['amount'],
+            attributes: ['payment_id', 'amount', 'createdAt'],
             required: false // fetch students even if they have no payments
           }
         ]
