@@ -1,10 +1,10 @@
 {
   "name": "cyber_school_api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Cyber School Management System is a backend API application built with Node.js and Express.js, utilizing Sequelize ORM for MySQL. It manages student records, school fees, payments, and provides analytics for a fictional school environment.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "start:populate": "cross-env POPULATE_DATA=true node server.js"
   },
   "repository": {

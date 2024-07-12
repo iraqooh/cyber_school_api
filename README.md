@@ -26,6 +26,8 @@ Welcome to the Cyber School Management System repository! This project is design
 
 [License](#license)
 
+[Authors](#authors)
+
 ## Introduction
 <a name="introduction"></a>
 
@@ -108,9 +110,11 @@ DELETE /api/cyber_school/students/:id Delete a student by ID.
 
 POST /api/cyber_school/payments: Make a payment for a student.
 
-GET /api/cyber_school/students-details: Fetch analytics data (registered students count, total fees, total payments, percentage paid, outstanding fees).
+GET /api/cyber_school/students-details: Fetch student financial data.
 
-GET /api/cyber_school/detailed-students: Fetch detailed student data (biodata, fees, total payments, payments list, outstanding fees).
+GET /api/cyber_school/students-details: Fetch detailed student data including fees and payments.
+
+GET /api/cyber_school/financials: Fetch school financial data (registered students count, total fees, total payments, percentage paid, outstanding fees).
 
 Refer to routes.js and cyberschool.controller.js for detailed implementation of each endpoint.
 
@@ -123,3 +127,22 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 <a name="license"></a>
 
 This project is licensed under the MIT License.
+
+## Authors
+<a name="authors"></a>
+
+[Iraku Harry](https://github.com/iraqooh/)
+
+[Atong Abraham Kur](https://github.com/Abram-MrRight)
+
+[Akoldou Samuel](https://github.com/Akoldou)
+
+[Ngong Abraham Kon](https://github.com/Ngongkon)
+
+[Afiti Andrew](https://github.com/1efitiAnndrew)
+
+[Geriga Sunday Drago](https://github.com/SundayDrago)
+
+[Bill Cheptoyek]()
+
+[Bernard M]()
