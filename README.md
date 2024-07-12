@@ -141,4 +141,4 @@ This project is licensed under the MIT License.
 
 [Geriga Sunday Drago](https://github.com/SundayDrago)
 
-[Bill Cheptoyek]()
+[Bill Cheptoyek](https://github.com/BILL-CHEPTOYEK)
