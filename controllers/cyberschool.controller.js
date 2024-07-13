@@ -297,52 +297,55 @@ async function getStudentDetails(req, res) {
 
 // Controller function to fetch detailed payment data
 async function getPaymentDetails(req, res) {
-    try {
-      // Fetch all students with their finance details (fees)
-      const students = await db.Student.findAll({
-        include: [
-          {
-            model: db.Finance,
-            attributes: ['fees'],
-            required: true // only students with finance records
-          },
-          {
-            model: db.Payment,
-            attributes: ['payment_id', 'amount', 'createdAt'],
-            required: false // fetch students even if they have no payments
-          }
-        ]
-      });
-  
-      // Format the response
-      const detailedStudents = students.map(student => ({
-        student_id: student.student_id,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        gender: student.gender,
-        date_of_birth: student.date_of_birth,
-        parents_contact: student.parents_contact,
-        physical_address: student.physical_address,
-        category: student.category,
-        class: student.class,
-        status: student.status,
-        school_fees: student.finances[0].fees,
-        total_payments: student.payments.reduce((total, payment) => total + payment.amount, 0),
-        payments: student.payments.map(payment => ({
-            payment_id: payment.payment_id,
-            amount: payment.amount,
-            createdAt: payment.createdAt
-        })),
-        outstanding_fees: student.finances[0].fees - student.payments.reduce((total, payment) => total + payment.amount, 0)
-      }));
-  
-      res.json(detailedStudents);
+  try {
+    // Fetch all students with their finance and payment details
+    const students = await db.Student.findAll({
+      include: [
+        {
+          model: db.Finance,
+          attributes: ['fees'],
+          required: true // only students with finance records
+        },
+        {
+          model: db.Payment,
+          attributes: ['payment_id', 'amount', 'createdAt'],
+          required: true // only students with payment records
+        }
+      ]
+    });
 
-    } catch (error) {
-      console.error('Error fetching detailed student data:', error);
-      res.status(500).json({ error: 'Failed to fetch detailed student data' });
-    }
+    // Format the response
+    const detailedPayments = students.flatMap(student =>
+      student.payments.map(payment => ({
+        payment_id: payment.payment_id,
+        amount: payment.amount,
+        createdAt: payment.createdAt,
+        student: {
+          student_id: student.student_id,
+          first_name: student.first_name,
+          last_name: student.last_name,
+          gender: student.gender,
+          date_of_birth: student.date_of_birth,
+          parents_contact: student.parents_contact,
+          physical_address: student.physical_address,
+          category: student.category,
+          class: student.class,
+          status: student.status,
+          school_fees: student.finances[0].fees,
+          total_payments: student.payments.reduce((total, pay) => total + pay.amount, 0),
+          outstanding_fees: student.finances[0].fees - student.payments.reduce((total, pay) => total + pay.amount, 0)
+        }
+      }))
+    );
+
+    res.json(detailedPayments);
+
+  } catch (error) {
+    console.error('Error fetching detailed payment data:', error);
+    res.status(500).json({ error: 'Failed to fetch detailed payment data' });
+  }
 }
+
 
 module.exports = {
   addStudent,
