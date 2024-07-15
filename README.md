@@ -72,9 +72,9 @@ MySQL database server
 
 Clone the repository:
 
-```git clone https://github.com/your-username/cyber-school.git```
+```git clone https://github.com/iraqooh/cyber_school_api.git```
 
-```cd cyber-school```
+```cd cyber_school_api```
 
 ### Install dependencies:
 <a name="dependencies"></a>
