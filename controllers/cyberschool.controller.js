@@ -255,7 +255,7 @@ async function getStudentDetails(req, res) {
           {
             model: db.Finance,
             attributes: ['fees'],
-            required: true // only students with finance records
+            required: false// only students with finance records
           },
           {
             model: db.Payment,
@@ -315,8 +315,8 @@ async function getPaymentDetails(req, res) {
     });
 
     // Format the response
-    const detailedPayments = students.flatMap(student =>
-      student.payments.map(payment => ({
+    const detailedPayments = students.reduce((acc, student) => {
+      const payments = student.payments.map(payment => ({
         payment_id: payment.payment_id,
         amount: payment.amount,
         createdAt: payment.createdAt,
@@ -335,8 +335,11 @@ async function getPaymentDetails(req, res) {
           total_payments: student.payments.reduce((total, pay) => total + pay.amount, 0),
           outstanding_fees: student.finances[0].fees - student.payments.reduce((total, pay) => total + pay.amount, 0)
         }
-      }))
-    );
+      }));
+    
+      return acc.concat(payments);
+    }, []);
+    
 
     res.json(detailedPayments);
 
