@@ -64,12 +64,47 @@ async function addStudent(req, res) {
 }
 
 // Controller function to find a student by student_id
+// async function findStudent(req, res) {
+//   try {
+//     const { 
+//         id, first_name, last_name, 
+//         physical_address, category, status, 
+//         class: student_class, gender } = req.query;
+
+//     const whereClause = {};
+
+//     if (id) whereClause.student_id = id;
+//     if (first_name) whereClause.first_name = { [Op.like]: `%${first_name}%` };
+//     if (last_name) whereClause.last_name = { [Op.like]: `%${last_name}%` };
+//     if (physical_address) whereClause.physical_address = { [Op.like]: `%${physical_address}%` };
+//     if (category) whereClause.category = category;
+//     if (status) whereClause.status = status;
+//     if (student_class) whereClause.class = { [Op.like]: `%${student_class}%` };
+//     if (gender) whereClause.gender = gender;
+
+//     const students = await db.Student.findAll({
+//         where: whereClause
+//     });
+
+//     if (!students || students.length === 0) {
+//         return res.status(404).json({ error: 'No students found with the provided criteria' });
+//     }
+
+//     res.json(students);
+
+//   } catch (error) {
+//     console.error('Error finding students:', error);
+//     res.status(500).json({ error: 'Failed to find students' });
+//   }
+// }
+
 async function findStudent(req, res) {
   try {
     const { 
         id, first_name, last_name, 
         physical_address, category, status, 
-        class: student_class, gender } = req.query;
+        class: student_class, gender 
+    } = req.query;
 
     const whereClause = {};
 
@@ -83,20 +118,40 @@ async function findStudent(req, res) {
     if (gender) whereClause.gender = gender;
 
     const students = await db.Student.findAll({
-        where: whereClause
+      where: whereClause
     });
 
+    const studentFees = await Promise.all(students.map(async (student) => {
+      const fee = await db.Finance.findOne({
+        where: { student_id: student.student_id}
+      })
+      const total_payments = await db.Payment.sum('amount', {
+        where: { student_id: student.student_id}
+      }) || 0
+      const payments = await db.Payment.findAll({
+        where: { student_id: student.student_id},
+        attributes: ['payment_id', 'amount', 'createdAt']
+      })
+      return {
+        ...student.dataValues,
+        fees: fee.fees,
+        total_payments: total_payments,
+        outstanding_fees: fee.fees - total_payments,
+        payments: payments
+      };
+    }))
+
     if (!students || students.length === 0) {
-        return res.status(404).json({ error: 'No students found with the provided criteria' });
+      return res.status(404).json({ error: 'No students found with the provided criteria' });
     }
 
-    res.json(students);
-
+    res.json(studentFees);
   } catch (error) {
     console.error('Error finding students:', error);
     res.status(500).json({ error: 'Failed to find students' });
   }
 }
+
 
 // update a student by student_id
 async function updateStudent(req, res) {
@@ -117,7 +172,7 @@ async function updateStudent(req, res) {
         const { error, value } = studentSchema.validate(req.body, { abortEarly: false });
 
         if (error) {
-        return res.status(400).json({ error: error.details.map(err => err.message) });
+            return res.status(400).json({ error: error.details.map(err => err.message) });
         }
 
         const { school_fees, initial_payment, ...studentData } = value;
@@ -125,18 +180,18 @@ async function updateStudent(req, res) {
         const student = await db.Student.findByPk(studentId);
 
         if (!student) {
-        return res.status(404).json({ error: 'Student not found' });
+            return res.status(404).json({ error: 'Student not found' });
         }
 
         const transaction = await db.sequelize.transaction();
 
         try {
-        await student.update(studentData, { transaction });
+            await student.update(studentData, { transaction });
 
-        await transaction.commit();
+            await transaction.commit();
 
-        res.json(student);
-
+            res.json(student);
+            
         } catch (error) {
             await transaction.rollback();
             throw error; // to be caught by outer try-catch block
@@ -295,6 +350,59 @@ async function getStudentDetails(req, res) {
     }
 }
 
+// Controller function to fetch detailed payment data
+async function getPaymentDetails(req, res) {
+  try {
+    // Fetch all students with their finance and payment details
+    const students = await db.Student.findAll({
+      include: [
+        {
+          model: db.Finance,
+          attributes: ['fees'],
+          required: true // only students with finance records
+        },
+        {
+          model: db.Payment,
+          attributes: ['payment_id', 'amount', 'createdAt'],
+          required: true // only students with payment records
+        }
+      ],
+    });
+
+    // Format the response
+    const detailedPayments = students.flatMap(student =>
+      student.payments.map(payment => ({
+        payment_id: payment.payment_id,
+        amount: payment.amount,
+        createdAt: payment.createdAt,
+        student: {
+          student_id: student.student_id,
+          first_name: student.first_name,
+          last_name: student.last_name,
+          gender: student.gender,
+          date_of_birth: student.date_of_birth,
+          parents_contact: student.parents_contact,
+          physical_address: student.physical_address,
+          category: student.category,
+          class: student.class,
+          status: student.status,
+          school_fees: student.finances[0].fees,
+          total_payments: student.payments.reduce((total, pay) => total + pay.amount, 0),
+          outstanding_fees: student.finances[0].fees - student.payments.reduce((total, pay) => total + pay.amount, 0)
+        }
+      }))
+    );
+
+    res.json(detailedPayments);
+
+  } catch (error) {
+    console.error('Error fetching detailed payment data:', error);
+    res.status(500).json({ error: 'Failed to fetch detailed payment data' });
+  }
+}
+
+
+
 module.exports = {
   addStudent,
   findStudent,
@@ -302,5 +410,6 @@ module.exports = {
   deleteStudent,
   makePayment,
   getSchoolFinancialData,
-  getStudentDetails
+  getStudentDetails,
+  getPaymentDetails
 };

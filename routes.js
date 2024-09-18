@@ -24,5 +24,8 @@ module.exports = app => {
     // fetch detailed student data
     router.get('/students-details', cyberschoolController.getStudentDetails);
 
+    // fetch detailed payment data
+    router.get('/payments-details', cyberschoolController.getPaymentDetails);
+
     app.use('/api/cyber_school', router)
 }

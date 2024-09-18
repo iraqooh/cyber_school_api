@@ -1,9 +1,10 @@
 const db_config = {
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'kaspastinski',
     database: 'cyber_school',
     dialect: 'mysql',
+    port: 3306,
     pool: {
         max: 10,
         min: 0,
