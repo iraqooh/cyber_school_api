@@ -9,7 +9,7 @@ const cors = require('cors');
 const cors_options = {
   origin: '*', // Allows all origins. For production, replace with specific domains.
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Specify the HTTP methods to allow
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'], // Specify allowed headers
 };
 app.use(cors(cors_options));
 
