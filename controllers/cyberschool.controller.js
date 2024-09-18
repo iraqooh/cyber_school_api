@@ -366,7 +366,7 @@ async function getPaymentDetails(req, res) {
           attributes: ['payment_id', 'amount', 'createdAt'],
           required: true // only students with payment records
         }
-      ],
+      ]
     });
 
     // Format the response
@@ -400,7 +400,6 @@ async function getPaymentDetails(req, res) {
     res.status(500).json({ error: 'Failed to fetch detailed payment data' });
   }
 }
-
 
 
 module.exports = {

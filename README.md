@@ -110,8 +110,6 @@ DELETE /api/cyber_school/students/:id Delete a student by ID.
 
 POST /api/cyber_school/payments: Make a payment for a student.
 
-GET /api/cyber_school/students-details: Fetch student financial data.
-
 GET /api/cyber_school/students-details: Fetch detailed student data including fees and payments.
 
 GET /api/cyber_school/financials: Fetch school financial data (registered students count, total fees, total payments, percentage paid, outstanding fees).
@@ -143,6 +141,4 @@ This project is licensed under the MIT License.
 
 [Geriga Sunday Drago](https://github.com/SundayDrago)
 
-[Bill Cheptoyek]()
-
-[Bernard M]()
+[Bill Cheptoyek](https://github.com/BILL-CHEPTOYEK)
