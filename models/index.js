@@ -6,6 +6,9 @@ const sequelize = new Sequelize(db_config.database, db_config.user, db_config.pa
     port: db_config.port,
     dialect: db_config.dialect,
     pool: db_config.pool,
+    dialectOptions: {
+        charset: 'utf8mb4', // Use utf8mb4 encoding for the connection
+    },
 });
 
 const db = {};
@@ -20,5 +23,6 @@ db.Student.hasMany(db.Finance, { foreignKey: 'student_id' });
 db.Finance.belongsTo(db.Student, { foreignKey: 'student_id' });
 db.Student.hasMany(db.Payment, { foreignKey: 'student_id' });
 db.Payment.belongsTo(db.Student, { foreignKey: 'student_id' });
+
 
 module.exports = db;

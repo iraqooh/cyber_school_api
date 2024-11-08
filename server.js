@@ -28,7 +28,15 @@ app.get('/test-db', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+app.get('/', (req, res) => {
+  res.status(200).send('Hello, World!');
+});
 
+// Export app first, before async operations
+module.exports = app;
+
+// Now handle async DB sync and server start
+if (require.main === module) {
 // Sync database
 db.sequelize.sync({ force: false }).then(async () => {
   console.log('Database synced');
@@ -45,3 +53,6 @@ db.sequelize.sync({ force: false }).then(async () => {
 }).catch((error) => {
   console.error('Unable to synchronize the database:', error);
 });
+}
+// Export app for testing
+//module.exports = app ;
